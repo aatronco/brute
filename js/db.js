@@ -80,3 +80,26 @@ export async function getSessionsByWeek(week) {
   db.close();
   return idx;
 }
+
+export async function exportAllData() {
+  const sessions = await getAllSessions();
+  return {
+    sessions,
+    accessoryProgress: JSON.parse(localStorage.getItem('brute_accessory_progress') || '{}'),
+    prs: JSON.parse(localStorage.getItem('brute_prs') || '{}'),
+    exportedAt: new Date().toISOString(),
+  };
+}
+
+export async function importAllData(data) {
+  for (const session of data.sessions || []) {
+    const { id, ...rest } = session; // let IndexedDB re-assign ids on import
+    await saveSession(rest);
+  }
+  if (data.accessoryProgress) {
+    localStorage.setItem('brute_accessory_progress', JSON.stringify(data.accessoryProgress));
+  }
+  if (data.prs) {
+    localStorage.setItem('brute_prs', JSON.stringify(data.prs));
+  }
+}
