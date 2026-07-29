@@ -39,9 +39,9 @@ test('Sentadilla T1 week 1 work set is 80% of 117.5 = 94 kg', () => {
   assert.equal(work.kg, 94);
 });
 
-test('Press Inclinado T1 week 1 work set is 80% of 75 = 60 kg', () => {
+test('Press Inclinado T1 week 1 work set is 80% of 82.5 = 66 kg', () => {
   const work = SESSIONS.upperB.T1[0].byWeek[1].work[0];
-  assert.equal(work.kg, 60);
+  assert.equal(work.kg, 66);
 });
 
 test('Pendlay Row T1 week 1 work set is 80% of 70 = 56 kg', () => {

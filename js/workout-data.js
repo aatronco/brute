@@ -240,14 +240,14 @@ export const UPPER_B = {
   T1: [
     {
       exercise: 'Press Inclinado',
-      base2RM: 75,
-      prBase: 80,
-      note: 'Base 2RM por Epley desde 60 kg × 10 (e1RM 80 → e2RM 75).',
-      byWeek: barbellByWeek(75, {
+      base2RM: 82.5,
+      prBase: 87.5,
+      note: 'Base 2RM actualizada por Epley desde 75 kg × 5 con facilidad (2026-07-29) — e1RM 87.5 → e2RM 82. Base anterior: 75 kg.',
+      byWeek: barbellByWeek(82.5, {
         warmupReps: [8, 5, 2],
         prAttempts: [
-          { label: 'Intento 1RM', reps: 1, kg: 77.5, rest: 300, type: 'pr', note: 'OPT-IN' },
-          { label: 'PR ★',        reps: 1, kg: 80,   rest: 0,   type: 'pr', note: 'e1RM actual' },
+          { label: 'Intento 1RM', reps: 1, kg: 85,   rest: 300, type: 'pr', note: 'OPT-IN' },
+          { label: 'PR ★',        reps: 1, kg: 87.5, rest: 0,   type: 'pr', note: 'e1RM actual' },
         ],
       }),
     },
