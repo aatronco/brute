@@ -1,14 +1,18 @@
 // js/workout-data.js
-// GZCL: The Rippler — programa de 12 semanas, 5 días. Static, never modified by the app.
-// T1: olas de % sobre 2RM · T2: olas de % sobre 5RM (Cody Lefever, GZCL Applications & Adaptations).
-// Días de pierna (S2/S4) y bloques kine: receta del kinesiólogo (julio 2026), por RPE — sin olas.
+// GZCL: The Rippler — programa de 12 semanas, 6 días (Upper/Lower A/B/C).
+// Static, never modified by the app.
+// T1: 6 levantamientos comparten la misma ola de 12 semanas sobre 2RM (Upper A/B, Lower A/B).
+// Upper C y Lower C no llevan ola — son días de accesorios con progresión doble local
+// (brazo y cuádriceps), sin T1/T2. Bloques kine (hombro terapéutico en Upper A/B): receta
+// del kinesiólogo (julio 2026), por RPE — sin olas.
 //
-// Bases estimadas (Epley, julio 2026, en déficit — PC 105 kg):
-//   Press Banca   2RM 110 kg   (de 3×5 @ 100)      → e1RM ~117
-//   Peso Muerto   2RM 177.5 kg (de 4 @ 170)         → e1RM ~190
-//   Dominadas     2RM 115 kg TOTAL (de 5 @ PC 105)  → e1RM total ~122
-//   Press Militar 5RM 42.5 kg  (de 8 @ 40)
-//   Remo Pendlay  5RM 65 kg    (de 5×5 @ 60)
+// Bases 2RM estimadas (Epley, julio 2026, en déficit — PC 105 kg):
+//   Press Banca      2RM 110 kg   (de 3×5 @ 100)      → e1RM ~117
+//   Pendlay Row      2RM 70 kg
+//   Sentadilla       2RM 117.5 kg
+//   Press Inclinado  2RM 75 kg    (de 60 × 10)        → e1RM ~80
+//   Peso Muerto      2RM 177.5 kg (de 4 @ 170)         → e1RM ~190
+//   Dominadas        2RM 115 kg TOTAL (de 5 @ PC 105)  → e1RM total ~122
 
 export const PROGRAM_WEEKS = 12;
 
