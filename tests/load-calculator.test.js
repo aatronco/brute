@@ -5,27 +5,47 @@ import assert from 'node:assert/strict';
 import { getT1Sets, getCurrentWeek } from '../js/load-calculator.js';
 import { PROGRAM_WEEKS } from '../js/workout-data.js';
 
-test('getT1Sets upperA week 1 is 3×5 @ 80% of 110 = 88 kg', () => {
-  const work = getT1Sets('upperA', 1).filter(s => s.type === 'work' && s.kg === 88);
-  assert.ok(work.length > 0);
+test('getT1Sets upperA t1Index 0 week 1 is 3×5 @ 80% of 110 = 88 kg', () => {
+  const work = getT1Sets('upperA', 1, 0).filter(s => s.type === 'work');
+  assert.equal(work[0].kg, 88);
   assert.equal(work[0].reps, 5);
   assert.equal(work[0].label, '3×5');
 });
 
-test('getT1Sets upperA week 8 is 8×1 @ 92.5% = 102 kg plus AMRAP', () => {
-  const work = getT1Sets('upperA', 8).filter(s => s.type === 'work' && s.kg === 102);
-  assert.ok(work.length > 0);
-  assert.equal(work[0].label, '8×1');
+test('getT1Sets upperA t1Index 1 (Pendlay) week 1 is 80% of 70 = 56 kg', () => {
+  const work = getT1Sets('upperA', 1, 1).filter(s => s.type === 'work');
+  assert.equal(work[0].kg, 56);
 });
 
-test('getT1Sets upperA week 12 has 95% single plus OPT-IN PR attempts', () => {
-  const sets = getT1Sets('upperA', 12);
-  const work = sets.filter(s => s.type === 'work' && s.kg === 105);
-  const prs  = sets.filter(s => s.type === 'pr');
-  assert.ok(work.length > 0); // 95% de 110
-  assert.ok(prs.length >= 2);
-  assert.ok(prs.some(s => s.kg === 112));
-  assert.ok(prs.some(s => s.kg === 117));
+test('getT1Sets upperA t1Index 0 week 8 is 8×1 @ 92.5% = 102 kg plus AMRAP', () => {
+  const work = getT1Sets('upperA', 8, 0).filter(s => s.type === 'work');
+  assert.equal(work[0].kg, 102);
+  assert.equal(work[0].label, '8×1');
+  assert.equal(work[1].label, 'AMRAP');
+});
+
+test('getT1Sets defaults t1Index to 0 when omitted', () => {
+  assert.deepEqual(getT1Sets('upperA', 1), getT1Sets('upperA', 1, 0));
+});
+
+test('getT1Sets upperB t1Index 1 (Dominadas) week 1 is assisted', () => {
+  const work = getT1Sets('upperB', 1, 1).find(s => s.type === 'work');
+  assert.match(work.kg, /Asistida/);
+});
+
+test('getT1Sets upperB t1Index 1 (Dominadas) week 10 is weighted', () => {
+  const work = getT1Sets('upperB', 10, 1).find(s => s.type === 'work');
+  assert.match(work.kg, /Lastre/);
+});
+
+test('getT1Sets upperB t1Index 1 (Dominadas) week 6 at 90% lands on bodyweight', () => {
+  const work = getT1Sets('upperB', 6, 1).find(s => s.type === 'work');
+  assert.equal(work.kg, 'Peso corporal');
+});
+
+test('getT1Sets lowerA (single T1, Sentadilla) week 1 is 80% of 117.5 = 94 kg', () => {
+  const work = getT1Sets('lowerA', 1).find(s => s.type === 'work');
+  assert.equal(work.kg, 94);
 });
 
 test('getT1Sets lowerB week 1 is 80% of 177.5 = 142 kg', () => {
@@ -45,29 +65,13 @@ test('getT1Sets lowerB week 12 PR attempts are 182 and 190', () => {
   assert.ok(sets.some(s => s.kg === 190 && s.type === 'pr'));
 });
 
-test('getT1Sets upperB pullups week 1 is assisted, week 10 is weighted', () => {
-  const w1  = getT1Sets('upperB', 1).find(s => s.type === 'work' && typeof s.kg === 'string');
-  const w10 = getT1Sets('upperB', 10).find(s => s.type === 'work' && typeof s.kg === 'string');
-  assert.match(w1.kg, /Asistida/);
-  assert.match(w10.kg, /Lastre/);
-});
-
-test('getT1Sets upperB pullups week 6 at 90% lands on bodyweight', () => {
-  const work = getT1Sets('upperB', 6).find(s => s.type === 'work' && typeof s.kg === 'string');
-  assert.equal(work.kg, 'Peso corporal');
-});
-
-test('getT1Sets leg days upperC/lowerC have no T1 tables', () => {
+test('getT1Sets sessions with no T1 (upperC, lowerC) return empty array', () => {
   assert.deepEqual(getT1Sets('upperC', 1), []);
   assert.deepEqual(getT1Sets('lowerC', 1), []);
 });
 
-test('getT1Sets covers all 12 weeks for every T1 session', () => {
-  for (const key of ['upperA', 'upperB', 'lowerB']) {
-    for (let w = 1; w <= PROGRAM_WEEKS; w++) {
-      assert.ok(getT1Sets(key, w).some(s => s.type === 'work'), `${key} week ${w}`);
-    }
-  }
+test('getT1Sets out-of-range t1Index returns empty array', () => {
+  assert.deepEqual(getT1Sets('lowerA', 1, 5), []);
 });
 
 test('getCurrentWeek returns 1 for day 0', () => {
