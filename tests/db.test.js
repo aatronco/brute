@@ -174,6 +174,9 @@ test('exportAllData returns sessions, accessoryProgress, prs, and a timestamp', 
   assert.deepEqual(data.accessoryProgress, { 'upperC:Curl bíceps mancuerna 45°': { kg: 16 } });
   assert.deepEqual(data.prs, { banca: 112 });
   assert.equal(typeof data.exportedAt, 'string');
+  assert.equal(data.app, 'brute');
+  assert.equal(data.schemaVersion, 1);
+  assert.equal(typeof data.programStart, 'string');
 });
 
 test('importAllData restores sessions and localStorage state', async () => {
@@ -181,9 +184,12 @@ test('importAllData restores sessions and localStorage state', async () => {
   mockStoreGlobal.nextId = 1;
   global.localStorage.clear();
   const payload = {
+    app: 'brute',
+    schemaVersion: 1,
     sessions: [{ date: '2026-01-01', session: 'lowerB', week: 3, phase: 'bloque1', completed: true, sets: [] }],
     accessoryProgress: { 'lowerC:Prensa': { kg: 190 } },
     prs: { deadlift: 180 },
+    programStart: '2026-01-01',
     exportedAt: '2026-01-01T00:00:00.000Z',
   };
   await importAllData(payload);
@@ -192,4 +198,5 @@ test('importAllData restores sessions and localStorage state', async () => {
   assert.ok(all.some(s => s.session === 'lowerB' && s.week === 3));
   assert.deepEqual(JSON.parse(localStorage.getItem('brute_accessory_progress')), payload.accessoryProgress);
   assert.deepEqual(JSON.parse(localStorage.getItem('brute_prs')), payload.prs);
+  assert.equal(localStorage.getItem('brute_program_start'), '2026-01-01');
 });

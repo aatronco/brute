@@ -1,5 +1,6 @@
 // js/db.js
 import { SESSIONS, PHASES, PROGRAM_WEEKS } from './workout-data.js';
+import { getProgramStart } from './load-calculator.js';
 
 export const DB_NAME    = 'workout-app';
 export const DB_VERSION = 1;
@@ -84,9 +85,12 @@ export async function getSessionsByWeek(week) {
 export async function exportAllData() {
   const sessions = await getAllSessions();
   return {
+    app: 'brute',
+    schemaVersion: 1,
     sessions,
     accessoryProgress: JSON.parse(localStorage.getItem('brute_accessory_progress') || '{}'),
     prs: JSON.parse(localStorage.getItem('brute_prs') || '{}'),
+    programStart: getProgramStart(),
     exportedAt: new Date().toISOString(),
   };
 }
@@ -101,5 +105,8 @@ export async function importAllData(data) {
   }
   if (data.prs) {
     localStorage.setItem('brute_prs', JSON.stringify(data.prs));
+  }
+  if (data.programStart) {
+    localStorage.setItem('brute_program_start', data.programStart);
   }
 }
