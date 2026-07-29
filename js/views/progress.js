@@ -30,6 +30,11 @@ function getPRTargets(sessionKey, t1Index) {
 }
 
 function miniChart(lifts, targets, currentWeek, prs) {
+  const allValsCheck = targets.flatMap(t => t.filter(x => x.top).map(x => x.top));
+  if (allValsCheck.length === 0) {
+    return `<div style="padding:20px;text-align:center;color:var(--dim);font-size:11px">Sin datos numéricos para graficar (carga por asistencia/lastre)</div>`;
+  }
+
   const W=360, H=130, PAD={t:16,r:12,b:32,l:40};
   const cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
   const weeks=WEEKS;
