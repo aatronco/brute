@@ -1,23 +1,23 @@
 // sw.js
-const CACHE = 'brute-v4';
+const CACHE = 'brute-v5';
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/css/style.css',
-  '/css/app.css',
-  '/css/print.css',
-  '/js/router.js',
-  '/js/db.js',
-  '/js/workout-data.js',
-  '/js/load-calculator.js',
-  '/js/progression.js',
-  '/js/timer.js',
-  '/js/audio-engine.js',
-  '/js/views/dashboard.js',
-  '/js/views/workout.js',
-  '/js/views/progress.js',
-  '/js/views/backup.js',
+  './',
+  './index.html',
+  './manifest.json',
+  './css/style.css',
+  './css/app.css',
+  './css/print.css',
+  './js/router.js',
+  './js/db.js',
+  './js/workout-data.js',
+  './js/load-calculator.js',
+  './js/progression.js',
+  './js/timer.js',
+  './js/audio-engine.js',
+  './js/views/dashboard.js',
+  './js/views/workout.js',
+  './js/views/progress.js',
+  './js/views/backup.js',
 ];
 
 self.addEventListener('install', e => {

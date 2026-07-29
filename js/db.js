@@ -2,7 +2,7 @@
 import { SESSIONS, PHASES, PROGRAM_WEEKS } from './workout-data.js';
 import { getProgramStart } from './load-calculator.js';
 
-export const DB_NAME    = 'workout-app';
+export const DB_NAME    = 'brute-workout-app';
 export const DB_VERSION = 1;
 export const STORES     = ['workout_sessions'];
 
