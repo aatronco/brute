@@ -2,28 +2,30 @@
 // Strength progression dashboard — shows planned vs actual PR targets per week.
 import { SESSIONS, PHASES, PROGRAM_WEEKS, getPhaseForWeek } from '../workout-data.js';
 import { getCurrentWeek } from '../load-calculator.js';
-import { getActiveAthleteId, getAthleteWeekOverride } from '../athletes.js';
-import { pushPRs, syncNow, pendingCount } from '../workout-sync.js';
+import { renderBackup, bindBackup } from './backup.js';
 
 const WEEKS = Array.from({ length: PROGRAM_WEEKS }, (_, i) => i + 1);
 
-const LIFTS = [
-  { key: 'S1', name: 'Press Banca', color: 'var(--pink)',   icon: '🏋️' },
-  { key: 'S5', name: 'Deadlift',    color: 'var(--gold)',   icon: '⛓️'  },
-];
-// Squat tracked separately — S2/S4 use kine RPE prescription, no byWeek targets
-const SQUAT_KEY = 'sentadilla';
+const LIFTS = Object.entries(SESSIONS).flatMap(([sessionKey, session]) =>
+  (session.T1 || []).map((t1, t1Index) => ({
+    key: `${sessionKey}:${t1Index}`,
+    sessionKey,
+    t1Index,
+    name: t1.exercise,
+    color: `var(--${session.color})`,
+  }))
+);
 
-function getPRTargets(sessionKey) {
-  const session = SESSIONS[sessionKey];
-  if (!session?.T1?.byWeek) return [];
+function getPRTargets(sessionKey, t1Index) {
+  const t1 = SESSIONS[sessionKey]?.T1?.[t1Index];
+  if (!t1?.byWeek) return [];
   return WEEKS.map(week => {
-    const sets = session.T1.byWeek[week];
+    const sets = t1.byWeek[week];
     if (!sets) return { week, top: null };
-    const topWork = [...(sets.warmup||[]), ...(sets.work||[])].filter(s => s.type !== 'warmup');
+    const topWork = [...(sets.warmup || []), ...(sets.work || [])].filter(s => s.type !== 'warmup');
     const pr     = topWork.find(s => s.type === 'pr');
-    const topSet = pr || topWork.reduce((a,b) => (b.kg > (a?.kg||0) ? b : a), null);
-    return { week, top: topSet?.kg||null, reps: topSet?.reps||null, label: topSet?.label||'' };
+    const topSet = pr || topWork.reduce((a, b) => (b.kg > (a?.kg || 0) ? b : a), null);
+    return { week, top: typeof topSet?.kg === 'number' ? topSet.kg : null, reps: topSet?.reps || null, label: topSet?.label || '' };
   });
 }
 
@@ -87,15 +89,13 @@ function miniChart(lifts, targets, currentWeek, prs) {
 
 export function renderProgress() {
   const startDate = localStorage.getItem('gzclp_program_start') || new Date().toISOString().slice(0,10);
-  const athleteId = getActiveAthleteId();
-  const week      = getCurrentWeek(startDate, getAthleteWeekOverride(athleteId));
-  const storedPRs = JSON.parse(localStorage.getItem('gzclp_prs') || '{}');
-  const actualPRs = {
-    S1: storedPRs.banca    || SESSIONS.S1?.T1?.prBase,
-    S5: storedPRs.deadlift || SESSIONS.S5?.T1?.prBase,
-  };
+  const week      = getCurrentWeek(startDate);
+  const storedPRs = JSON.parse(localStorage.getItem('brute_prs') || '{}');
+  const actualPRs = Object.fromEntries(
+    LIFTS.map(l => [l.key, storedPRs[l.key] ?? SESSIONS[l.sessionKey]?.T1?.[l.t1Index]?.prBase])
+  );
 
-  const targets = LIFTS.map(l => getPRTargets(l.key));
+  const targets = LIFTS.map(l => getPRTargets(l.sessionKey, l.t1Index));
 
   // Per-lift tables
   const liftCards = LIFTS.map((lift, li) => {
@@ -124,7 +124,7 @@ export function renderProgress() {
       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px">
         <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-size:14px;font-weight:800;color:${lift.color}">${lift.icon} ${lift.name}</div>
+            <div style="font-size:14px;font-weight:800;color:${lift.color}">${lift.name}</div>
             <div style="font-size:11px;color:var(--dim);margin-top:2px">Semana actual: S${week} — ${getPhaseForWeek(week).label}</div>
           </div>
           ${pct != null ? `<div style="text-align:center">
@@ -150,98 +150,31 @@ export function renderProgress() {
       </div>`;
   }).join('');
 
-  // Squat card (kine session, RPE-based — no weekly targets)
-  const squatPR = storedPRs[SQUAT_KEY];
-  const squatCard = `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div>
-          <div style="font-size:14px;font-weight:800;color:var(--cyan)">🏔️ Sentadilla (Squat low back bar)</div>
-          <div style="font-size:11px;color:var(--dim);margin-top:2px">S2 · receta kine · carga por RPE</div>
-        </div>
-        ${squatPR ? `<div style="text-align:center">
-          <div style="font-size:22px;font-weight:800;color:var(--cyan)">${squatPR} kg</div>
-          <div style="font-size:9px;color:var(--dim)">PR back squat</div>
-        </div>` : `<div style="font-size:11px;color:var(--dim)">Sin PR registrado</div>`}
-      </div>
-      <div style="font-size:11px;color:rgba(255,255,255,.3);font-family:'JetBrains Mono',monospace;border-top:1px solid var(--border);padding-top:10px">
-        S2 squat low back bar 3×8 @8 · Progresa cuando se sienta @7 o menos · EVA ≤3
-      </div>
-    </div>`;
-
-  // Pull-up progression — ola Rippler sobre 2RM total (cuerpo + lastre)
-  const s3 = SESSIONS.S3;
-  const pullupCard = s3?.T1?.byWeek ? `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="font-size:14px;font-weight:800;color:var(--mint);margin-bottom:4px">🔝 Dominadas — ola 2RM</div>
-      <div style="font-size:11px;color:var(--dim);margin-bottom:10px">2RM total ${s3.T1.base2RMTotal} kg (PC ${s3.T1.bodyweight} kg) · asistida en semanas livianas, lastre en las pesadas</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-        ${WEEKS.map(w => {
-          const work = s3.T1.byWeek[w]?.work?.[0];
-          if (!work) return '';
-          return `
-            <div style="background:${w===week?'rgba(0,255,159,.08)':'rgba(255,255,255,.03)'};border:1px solid ${w===week?'var(--mint)':'var(--border)'};border-radius:10px;padding:8px;text-align:center">
-              <div style="font-size:9px;color:var(--dim)">S${w}</div>
-              <div style="font-size:13px;font-weight:800;color:var(--mint)">${work.label}</div>
-              <div style="font-size:9px;color:var(--dim);line-height:1.3">${work.kg}</div>
-            </div>`;
-        }).join('')}
-      </div>
-    </div>` : '';
-
   // Update PRs form
   const updateForm = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">◈ Actualizar PRs reales</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-        <div style="flex:1;min-width:120px">
-          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:4px">Press Banca (kg)</label>
-          <input id="pr-banca" type="number" value="${storedPRs.banca||''}" step="0.5" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace">
-        </div>
-        <div style="flex:1;min-width:120px">
-          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:4px">Deadlift (kg)</label>
-          <input id="pr-deadlift" type="number" value="${storedPRs.deadlift||''}" step="0.5" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace">
-        </div>
-        <div style="flex:1;min-width:120px">
-          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:4px">Sentadilla (kg)</label>
-          <input id="pr-sentadilla" type="number" value="${storedPRs[SQUAT_KEY]||''}" step="0.5" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace">
-        </div>
-        <div style="flex:1;min-width:120px">
-          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:4px">Pullups (reps)</label>
-          <input id="pr-pullups" type="number" value="${storedPRs.pullups||''}" step="1" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace">
-        </div>
+        ${LIFTS.map(l => `
+          <div style="flex:1;min-width:120px">
+            <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:4px">${l.name} (kg)</label>
+            <input type="number" data-pr-input data-pr-key="${l.key}" value="${storedPRs[l.key] || ''}" step="0.5"
+              style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace">
+          </div>
+        `).join('')}
       </div>
       <button id="save-prs" style="width:100%;padding:12px;background:var(--purple);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:800;cursor:pointer">Guardar PRs</button>
-    </div>`;
-
-  // Sync card — respaldo en Google Sheets (pestañas Entrenamientos y PRs)
-  const pending = pendingCount();
-  const syncCard = `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--text)">☁ Respaldo en Google Sheets</div>
-          <div id="sync-status" style="font-size:11px;color:var(--dim);margin-top:2px">
-            ${pending ? `${pending} registro${pending > 1 ? 's' : ''} pendiente${pending > 1 ? 's' : ''} de respaldar` : 'Sesiones y PRs se respaldan al guardar'}
-          </div>
-        </div>
-        <button id="sync-sheets" style="padding:10px 18px;background:transparent;border:1px solid var(--cyan);border-radius:10px;color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer">
-          Sincronizar ahora
-        </button>
-      </div>
     </div>`;
 
   return `
     <div style="padding:14px 14px 20px">
       <button class="btn btn-dim" data-back style="margin-bottom:12px;padding:8px 16px;">← Volver</button>
 
-      <h2 style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px">📈 Progresión — The Rippler</h2>
+      <h2 style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px">📈 Progresión</h2>
       <div style="font-size:12px;color:var(--dim);margin-bottom:20px">Semana ${week} de ${PROGRAM_WEEKS} — ${getPhaseForWeek(week).label}</div>
       ${updateForm}
-      ${syncCard}
+      ${renderBackup()}
       ${liftCards}
-      ${squatCard}
-      ${pullupCard}
     </div>`;
 }
 
@@ -251,18 +184,12 @@ export function bindProgress() {
   });
 
   document.getElementById('save-prs')?.addEventListener('click', () => {
-    const banca      = parseFloat(document.getElementById('pr-banca')?.value);
-    const deadlift   = parseFloat(document.getElementById('pr-deadlift')?.value);
-    const sentadilla = parseFloat(document.getElementById('pr-sentadilla')?.value);
-    const pullups    = parseInt(document.getElementById('pr-pullups')?.value);
     const prs = {};
-    if (!isNaN(banca))      prs.banca      = banca;
-    if (!isNaN(deadlift))   prs.deadlift   = deadlift;
-    if (!isNaN(sentadilla)) prs[SQUAT_KEY] = sentadilla;
-    if (!isNaN(pullups))    prs.pullups    = pullups;
-    localStorage.setItem('gzclp_prs', JSON.stringify(prs));
-    // Respaldo: pushPRs encola de forma síncrona, así el reload no pierde la fila
-    pushPRs(prs, getActiveAthleteId()).catch(() => {});
+    document.querySelectorAll('[data-pr-input]').forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) prs[input.dataset.prKey] = val;
+    });
+    localStorage.setItem('brute_prs', JSON.stringify(prs));
     const btn = document.getElementById('save-prs');
     btn.textContent = '✓ Guardado';
     btn.style.background = 'var(--mint)';
@@ -270,25 +197,5 @@ export function bindProgress() {
     setTimeout(() => location.reload(), 800);
   });
 
-  document.getElementById('sync-sheets')?.addEventListener('click', async () => {
-    const btn    = document.getElementById('sync-sheets');
-    const status = document.getElementById('sync-status');
-    btn.disabled = true;
-    btn.textContent = 'Sincronizando…';
-    try {
-      const res = await syncNow();
-      if (res.imported === null) {
-        status.textContent = `☁ ${res.synced} respaldada(s) — no se pudo leer el remoto`;
-      } else {
-        status.textContent = `☁ ${res.synced} respaldada(s) · ${res.imported} importada(s)` +
-          (res.prsRestored ? ' · PRs restaurados' : '') +
-          (res.pending ? ` · ${res.pending} pendiente(s)` : '');
-      }
-      if (res.imported || res.prsRestored) setTimeout(() => location.reload(), 1200);
-    } catch {
-      status.textContent = 'Sin conexión o sin sesión de Google — se reintentará después';
-    }
-    btn.disabled = false;
-    btn.textContent = 'Sincronizar ahora';
-  });
+  bindBackup();
 }
