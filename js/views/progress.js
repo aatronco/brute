@@ -1,7 +1,7 @@
 // js/views/progress.js
 // Strength progression dashboard — shows planned vs actual PR targets per week.
 import { SESSIONS, PHASES, PROGRAM_WEEKS, getPhaseForWeek } from '../workout-data.js';
-import { getCurrentWeek } from '../load-calculator.js';
+import { getCurrentWeek, getProgramStart } from '../load-calculator.js';
 import { renderBackup, bindBackup } from './backup.js';
 
 const WEEKS = Array.from({ length: PROGRAM_WEEKS }, (_, i) => i + 1);
@@ -93,7 +93,7 @@ function miniChart(lifts, targets, currentWeek, prs) {
 }
 
 export function renderProgress() {
-  const startDate = localStorage.getItem('gzclp_program_start') || new Date().toISOString().slice(0,10);
+  const startDate = getProgramStart();
   const week      = getCurrentWeek(startDate);
   const storedPRs = JSON.parse(localStorage.getItem('brute_prs') || '{}');
   const actualPRs = Object.fromEntries(
@@ -155,6 +155,14 @@ export function renderProgress() {
       </div>`;
   }).join('');
 
+  // Program start control
+  const programStartForm = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">
+      <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:4px">Inicio del programa</label>
+      <input type="date" id="program-start-input" value="${startDate}"
+        style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace">
+    </div>`;
+
   // Update PRs form
   const updateForm = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">
@@ -177,6 +185,7 @@ export function renderProgress() {
 
       <h2 style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px">📈 Progresión</h2>
       <div style="font-size:12px;color:var(--dim);margin-bottom:20px">Semana ${week} de ${PROGRAM_WEEKS} — ${getPhaseForWeek(week).label}</div>
+      ${programStartForm}
       ${updateForm}
       ${renderBackup()}
       ${liftCards}
@@ -186,6 +195,13 @@ export function renderProgress() {
 export function bindProgress() {
   document.querySelector('[data-back]')?.addEventListener('click', () => {
     location.hash = '#/dashboard';
+  });
+
+  document.getElementById('program-start-input')?.addEventListener('change', (e) => {
+    const val = e.target.value;
+    if (!val) return;
+    localStorage.setItem('brute_program_start', val);
+    location.reload();
   });
 
   document.getElementById('save-prs')?.addEventListener('click', () => {

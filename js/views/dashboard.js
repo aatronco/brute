@@ -1,9 +1,9 @@
 // js/views/dashboard.js
-import { getCurrentWeek } from '../load-calculator.js';
+import { getCurrentWeek, getProgramStart } from '../load-calculator.js';
 import { SESSIONS, PROGRAM_WEEKS, getPhaseForWeek } from '../workout-data.js';
 
 export function renderDashboard() {
-  const startDate = localStorage.getItem('gzclp_program_start') || new Date().toISOString().slice(0,10);
+  const startDate = getProgramStart();
   const week      = getCurrentWeek(startDate);
   const storedPRs = JSON.parse(localStorage.getItem('brute_prs') || '{}');
   const prBanca   = storedPRs['upperA:0'] ?? SESSIONS.upperA?.T1?.[0]?.prBase;

@@ -2,8 +2,17 @@
 // The Rippler: T1 waves off 2RM — Banca 110, DL 177.5, Dominadas 115 total.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { getT1Sets, getCurrentWeek } from '../js/load-calculator.js';
+import { getT1Sets, getCurrentWeek, getProgramStart } from '../js/load-calculator.js';
 import { PROGRAM_WEEKS } from '../js/workout-data.js';
+
+// Minimal localStorage stub for Node (this file doesn't otherwise need one)
+if (typeof globalThis.localStorage === 'undefined') {
+  globalThis.localStorage = {
+    _data: {},
+    getItem(k) { return this._data[k] ?? null; },
+    setItem(k, v) { this._data[k] = String(v); },
+  };
+}
 
 test('getT1Sets upperA t1Index 0 week 1 is 3×5 @ 80% of 110 = 88 kg', () => {
   const work = getT1Sets('upperA', 1, 0).filter(s => s.type === 'work');
@@ -110,4 +119,20 @@ test('getCurrentWeek falls back to date calculation when override is null', () =
   const d = new Date();
   d.setDate(d.getDate() - 8);
   assert.equal(getCurrentWeek(d.toISOString().slice(0, 10), null), 2);
+});
+
+test('getProgramStart returns today and persists it when nothing stored', () => {
+  globalThis.localStorage._data = {};
+  const today = new Date().toISOString().slice(0, 10);
+  const result = getProgramStart();
+  assert.equal(result, today);
+  assert.equal(localStorage.getItem('brute_program_start'), today);
+});
+
+test('getProgramStart is idempotent across repeated calls', () => {
+  globalThis.localStorage._data = {};
+  const first  = getProgramStart();
+  const second = getProgramStart();
+  assert.equal(first, second);
+  assert.equal(localStorage.getItem('brute_program_start'), first);
 });

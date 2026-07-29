@@ -1,6 +1,6 @@
 // js/views/workout.js
 import { SESSIONS, getPhaseForWeek } from '../workout-data.js';
-import { getT1Sets, getCurrentWeek } from '../load-calculator.js';
+import { getT1Sets, getCurrentWeek, getProgramStart } from '../load-calculator.js';
 import { saveSession }                from '../db.js';
 import { createTimer }                from '../timer.js';
 import { getAccessoryWeight, recordAccessorySet } from '../progression.js';
@@ -11,7 +11,7 @@ export function renderWorkout(sessionKey) {
   const session = SESSIONS[sessionKey];
   if (!session) return `<p style="padding:20px;color:var(--dim)">Sesión no encontrada.</p>`;
 
-  const startDate = localStorage.getItem('gzclp_program_start') || new Date().toISOString().slice(0,10);
+  const startDate = getProgramStart();
   const week      = getCurrentWeek(startDate);
   const phase     = getPhaseForWeek(week);
 
@@ -147,7 +147,7 @@ export function bindWorkout(sessionKey) {
   const completeBtn = document.getElementById('btn-complete-session');
   if (completeBtn) {
     completeBtn.addEventListener('click', async () => {
-      const startDate = localStorage.getItem('gzclp_program_start') || new Date().toISOString().slice(0,10);
+      const startDate = getProgramStart();
       const week      = getCurrentWeek(startDate);
       const phase     = getPhaseForWeek(week);
       const record = {

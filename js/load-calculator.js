@@ -9,6 +9,14 @@ export function getT1Sets(session, week, t1Index = 0) {
   return [...(weekData.warmup || []), ...(weekData.work || [])];
 }
 
+export function getProgramStart() {
+  const stored = localStorage.getItem('brute_program_start');
+  if (stored) return stored;
+  const today = new Date().toISOString().slice(0, 10);
+  localStorage.setItem('brute_program_start', today);
+  return today;
+}
+
 export function getCurrentWeek(programStartDate, weekOverride) {
   if (weekOverride != null) {
     return Math.min(Math.max(parseInt(weekOverride, 10), 1), PROGRAM_WEEKS);
