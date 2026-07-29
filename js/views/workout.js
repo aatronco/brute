@@ -273,12 +273,13 @@ function renderT3List(exercises, week) {
 function renderAccessoryList(sessionKey, accessories, week) {
   return accessories.map((a, i) => {
     const kg = getAccessoryWeight(sessionKey, a.name, a.startKg);
+    const kgLabel = kg === 0 ? 'Peso corporal' : `${kg} kg`;
     const effectiveSets = week >= 11 ? Math.max(1, Math.round(a.sets * 0.7)) : a.sets;
     return `
       <div class="session-card" data-accessory-card data-accessory-index="${i}">
         <div class="session-card__title">${a.name}</div>
         <div class="ex-meta" style="font-size:13px;color:var(--dim);">
-          <b style="color:var(--text)">${kg} kg</b> · ${effectiveSets}×${a.repRange[0]}-${a.repRange[1]}
+          <b style="color:var(--text)">${kgLabel}</b> · ${effectiveSets}×${a.repRange[0]}-${a.repRange[1]}
           ${a.rest ? `· ${a.rest}"` : ''}
           ${a.rest > 0 ? `<button data-rest="${a.rest}" style="background:var(--purple);border:none;border-radius:8px;padding:3px 10px;color:#fff;font-size:11px;cursor:pointer;margin-left:8px;">▶</button>` : ''}
         </div>
