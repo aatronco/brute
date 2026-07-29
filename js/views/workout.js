@@ -162,8 +162,9 @@ export function bindWorkout(sessionKey) {
         const inputs = card.querySelectorAll('[data-accessory-reps]');
         const name = inputs[0]?.dataset.accessoryName;
         if (!name) return;
-        const reps = Array.from(inputs).map(i => parseInt(i.value, 10)).filter(n => !isNaN(n));
-        if (!reps.length) return;
+        const touched = inputs.length && Array.from(inputs).some(i => i.value !== '');
+        if (!touched) return;
+        const reps = Array.from(inputs).map(i => parseInt(i.value, 10) || 0);
         const accessory = session.accessories.find(a => a.name === name);
         if (!accessory) return;
         recordAccessorySet(sessionKey, name, reps, accessory.repRange, accessory.incrementKg, accessory.startKg);

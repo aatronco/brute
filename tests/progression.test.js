@@ -37,3 +37,14 @@ test('progress is tracked per session+exercise independently', () => {
   recordAccessorySet('upperC', 'Curl martillo', [12, 12], [8, 12], 2, 14);
   assert.equal(getAccessoryWeight('lowerC', 'Curl martillo', 14), 14);
 });
+
+// Regression: a partially-logged set (blank inputs counted as 0, not omitted)
+// must NOT bump weight — only reaching the top of the range on every set does.
+test('recordAccessorySet with a mixed reps array (some below top) does not bump weight', () => {
+  recordAccessorySet('lowerC', 'Pistol SQ excéntrico', [12, 9], [8, 12], 2, 20);
+  assert.equal(getAccessoryWeight('lowerC', 'Pistol SQ excéntrico', 20), 20);
+});
+
+test('getAccessoryWeight before any recordAccessorySet call returns startKg', () => {
+  assert.equal(getAccessoryWeight('lowerC', 'Prensa', 100), 100);
+});
