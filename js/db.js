@@ -68,6 +68,12 @@ export async function getAllSessions() {
   return all;
 }
 
+export async function clearAllSessions() {
+  const db = await openDB();
+  await tx(db, 'workout_sessions', 'readwrite', s => s.clear());
+  db.close();
+}
+
 export async function getSessionsByWeek(week) {
   const db  = await openDB();
   const idx = await new Promise((resolve, reject) => {
@@ -96,7 +102,11 @@ export async function exportAllData() {
 }
 
 export async function importAllData(data) {
-  for (const session of data.sessions || []) {
+  const isValid = data && data.app === 'brute' && typeof data.schemaVersion === 'number' && Array.isArray(data.sessions);
+  if (!isValid) throw new Error('Invalid backup file');
+
+  await clearAllSessions();
+  for (const session of data.sessions) {
     const { id, ...rest } = session; // let IndexedDB re-assign ids on import
     await saveSession(rest);
   }

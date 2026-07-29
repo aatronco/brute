@@ -3,7 +3,7 @@
 // the object store config and validates session objects.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateSession, DB_NAME, DB_VERSION, STORES, saveSession, getAllSessions, exportAllData, importAllData } from '../js/db.js';
+import { validateSession, DB_NAME, DB_VERSION, STORES, saveSession, getAllSessions, exportAllData, importAllData, clearAllSessions } from '../js/db.js';
 
 // Mock IndexedDB and localStorage for Node environment
 class MockObjectStore {
@@ -29,6 +29,12 @@ class MockObjectStore {
   getAll() {
     const request = { onsuccess: null, onerror: null };
     setImmediate(() => request.onsuccess?.({ target: { result: [...this.globalStore.data] } }));
+    return request;
+  }
+  clear() {
+    const request = { onsuccess: null, onerror: null };
+    this.globalStore.data = [];
+    setImmediate(() => request.onsuccess?.({ target: { result: undefined } }));
     return request;
   }
   index(name) {
@@ -199,4 +205,41 @@ test('importAllData restores sessions and localStorage state', async () => {
   assert.deepEqual(JSON.parse(localStorage.getItem('brute_accessory_progress')), payload.accessoryProgress);
   assert.deepEqual(JSON.parse(localStorage.getItem('brute_prs')), payload.prs);
   assert.equal(localStorage.getItem('brute_program_start'), '2026-01-01');
+});
+
+test('importAllData rejects a malformed payload without touching the DB', async () => {
+  mockStoreGlobal.data = [];
+  mockStoreGlobal.nextId = 1;
+  global.localStorage.clear();
+  await saveSession({ date: '2026-01-01', session: 'upperA', week: 1, phase: 'bloque1', completed: true, sets: [] });
+
+  const badPayload = { sessions: [{ date: '2026-02-02', session: 'lowerA', week: 2, phase: 'bloque1', completed: true, sets: [] }] };
+  await assert.rejects(() => importAllData(badPayload), /Invalid backup file/);
+
+  const all = await getAllSessions();
+  assert.equal(all.length, 1);
+  assert.ok(all.some(s => s.session === 'upperA'));
+});
+
+test('importAllData is idempotent — importing the same valid payload twice does not double sessions', async () => {
+  mockStoreGlobal.data = [];
+  mockStoreGlobal.nextId = 1;
+  global.localStorage.clear();
+  const payload = {
+    app: 'brute',
+    schemaVersion: 1,
+    sessions: [
+      { date: '2026-01-01', session: 'lowerB', week: 3, phase: 'bloque1', completed: true, sets: [] },
+      { date: '2026-01-08', session: 'upperA', week: 4, phase: 'bloque1', completed: true, sets: [] },
+    ],
+    accessoryProgress: {},
+    prs: {},
+    programStart: '2026-01-01',
+    exportedAt: '2026-01-01T00:00:00.000Z',
+  };
+  await importAllData(payload);
+  await importAllData(payload);
+
+  const all = await getAllSessions();
+  assert.equal(all.length, payload.sessions.length);
 });

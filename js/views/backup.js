@@ -39,7 +39,9 @@ export function bindBackup() {
       status.textContent = `✓ Importado — ${data.sessions?.length || 0} sesiones restauradas.`;
       setTimeout(() => location.reload(), 1000);
     } catch (err) {
-      status.textContent = 'Error al importar: archivo inválido.';
+      status.textContent = err?.message === 'Invalid backup file'
+        ? 'Error al importar: el archivo no es un respaldo válido de Brute.'
+        : 'Error al importar: archivo inválido.';
     }
   });
 }
