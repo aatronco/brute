@@ -20,6 +20,10 @@ test('upperB has two T1 lifts: Press Inclinado and Dominadas', () => {
   assert.deepEqual(names, ['Press Inclinado', 'Dominadas (ola 2RM)']);
 });
 
+test('upperB Dominadas T1 has prBase 122 (e1RM from 2RM total 115 @ PC 105)', () => {
+  assert.equal(SESSIONS.upperB.T1[1].prBase, 122);
+});
+
 test('lowerA has one T1 lift: Sentadilla', () => {
   assert.equal(SESSIONS.lowerA.T1.length, 1);
   assert.equal(SESSIONS.lowerA.T1[0].exercise, 'Sentadilla');

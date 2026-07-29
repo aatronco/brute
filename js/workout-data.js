@@ -246,6 +246,7 @@ export const UPPER_B = {
       exercise: 'Dominadas (ola 2RM)',
       base2RMTotal: PULLUP.total2RM,
       bodyweight: PULLUP.bodyweight,
+      prBase: 122,
       note: `Ola sobre 2RM total (cuerpo + lastre) = ${PULLUP.total2RM} kg con PC ${PULLUP.bodyweight} kg. ` +
             'Al bajar de peso en el déficit, reduce la asistencia ~2.5 kg por cada 2 kg de PC perdidos.',
       byWeek: pullupByWeek(),
