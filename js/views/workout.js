@@ -3,8 +3,7 @@ import { SESSIONS, getPhaseForWeek } from '../workout-data.js';
 import { getT1Sets, getCurrentWeek } from '../load-calculator.js';
 import { saveSession }                from '../db.js';
 import { createTimer }                from '../timer.js';
-import { getActiveAthleteId, getAthleteWeekOverride } from '../athletes.js';
-import { pushSession }                from '../workout-sync.js';
+import { getAccessoryWeight, recordAccessorySet } from '../progression.js';
 
 let activeTimer = null;
 
@@ -13,8 +12,7 @@ export function renderWorkout(sessionKey) {
   if (!session) return `<p style="padding:20px;color:var(--dim)">Sesión no encontrada.</p>`;
 
   const startDate = localStorage.getItem('gzclp_program_start') || new Date().toISOString().slice(0,10);
-  const athleteId = getActiveAthleteId();
-  const week      = getCurrentWeek(startDate, getAthleteWeekOverride(athleteId));
+  const week      = getCurrentWeek(startDate);
   const phase     = getPhaseForWeek(week);
 
   const body = session.bloque
@@ -55,28 +53,42 @@ export function renderWorkout(sessionKey) {
 }
 
 function renderTiers(sessionKey, session, week) {
-  const t1Sets = getT1Sets(sessionKey, week);
+  const t1Blocks = (session.T1 || []).map((t1, i) => `
+    <h2 class="sh" style="margin-top:18px;">
+      <span class="dot" style="background:var(--${session.color})"></span>T1 — ${t1.exercise}
+    </h2>
+    ${t1.note ? `<div style="font-size:12px;color:#ddb0ff;margin-bottom:8px;">${t1.note}</div>` : ''}
+    ${renderT1Table(getT1Sets(sessionKey, week, i))}
+  `).join('');
+
   return `
     ${session.warmup ? renderWarmup(session.warmup) : ''}
 
-    <h2 class="sh" style="margin-top:18px;">
-      <span class="dot" style="background:var(--${session.color})"></span>T1 — ${session.T1.exercise}
-    </h2>
-    ${session.T1.note ? `<div style="font-size:12px;color:#ddb0ff;margin-bottom:8px;">${session.T1.note}</div>` : ''}
-    ${renderT1Table(t1Sets)}
+    ${t1Blocks}
 
-    <h2 class="sh" style="margin-top:18px;">
-      <span class="dot" style="background:var(--mint)"></span>T2 — Hipertrofia
-      <span style="font-size:11px;color:var(--dim);font-weight:400;">olas de 5RM · accesorios última serie RPE 9</span>
-    </h2>
-    ${renderT2List(session.T2, week)}
+    ${session.T2?.length ? `
+      <h2 class="sh" style="margin-top:18px;">
+        <span class="dot" style="background:var(--mint)"></span>T2 — Hipertrofia
+        <span style="font-size:11px;color:var(--dim);font-weight:400;">olas de 5RM · accesorios última serie RPE 9</span>
+      </h2>
+      ${renderT2List(session.T2, week)}
+    ` : ''}
 
     ${session.kineBlock ? renderKineBlock(session.kineBlock) : ''}
 
-    <h2 class="sh" style="margin-top:18px;">
-      <span class="dot" style="background:var(--orange)"></span>T3 — Aislamiento
-    </h2>
-    ${renderT3List(session.T3, week)}
+    ${session.T3?.length ? `
+      <h2 class="sh" style="margin-top:18px;">
+        <span class="dot" style="background:var(--orange)"></span>Accesorios obligatorios
+      </h2>
+      ${renderT3List(session.T3, week)}
+    ` : ''}
+
+    ${session.accessories?.length ? `
+      <h2 class="sh" style="margin-top:18px;">
+        <span class="dot" style="background:var(--orange)"></span>Accesorios — carga progresiva
+      </h2>
+      ${renderAccessoryList(sessionKey, session.accessories)}
+    ` : ''}
   `;
 }
 
@@ -136,8 +148,7 @@ export function bindWorkout(sessionKey) {
   if (completeBtn) {
     completeBtn.addEventListener('click', async () => {
       const startDate = localStorage.getItem('gzclp_program_start') || new Date().toISOString().slice(0,10);
-      const athleteId = getActiveAthleteId();
-      const week      = getCurrentWeek(startDate, getAthleteWeekOverride(athleteId));
+      const week      = getCurrentWeek(startDate);
       const phase     = getPhaseForWeek(week);
       const record = {
         date: new Date().toISOString().slice(0,10),
@@ -147,6 +158,16 @@ export function bindWorkout(sessionKey) {
         completed: true,
         sets: [],
       };
+      document.querySelectorAll('[data-accessory-card]').forEach(card => {
+        const inputs = card.querySelectorAll('[data-accessory-reps]');
+        const name = inputs[0]?.dataset.accessoryName;
+        if (!name) return;
+        const reps = Array.from(inputs).map(i => parseInt(i.value, 10)).filter(n => !isNaN(n));
+        if (!reps.length) return;
+        const accessory = session.accessories.find(a => a.name === name);
+        if (!accessory) return;
+        recordAccessorySet(sessionKey, name, reps, accessory.repRange, accessory.incrementKg, accessory.startKg);
+      });
       try {
         await saveSession(record);
         completeBtn.textContent = '✓ ¡Sesión guardada!';
@@ -158,13 +179,6 @@ export function bindWorkout(sessionKey) {
         completeBtn.disabled = false;
         return;
       }
-      // Respaldo en Google Sheets — best effort, la sesión ya está guardada localmente
-      try {
-        const res = await pushSession(record, athleteId);
-        completeBtn.textContent = res.pending
-          ? '✓ Guardada · ☁ respaldo pendiente'
-          : '✓ Guardada · ☁ respaldada';
-      } catch { /* queda en cola para el próximo arranque */ }
     });
   }
 }
@@ -253,6 +267,30 @@ function renderT3List(exercises, week) {
         </div>
       `;
     }).join('');
+}
+
+function renderAccessoryList(sessionKey, accessories) {
+  return accessories.map((a, i) => {
+    const kg = getAccessoryWeight(sessionKey, a.name, a.startKg);
+    return `
+      <div class="session-card" data-accessory-card data-accessory-index="${i}">
+        <div class="session-card__title">${a.name}</div>
+        <div class="ex-meta" style="font-size:13px;color:var(--dim);">
+          <b style="color:var(--text)">${kg} kg</b> · ${a.sets}×${a.repRange[0]}-${a.repRange[1]}
+          ${a.rest ? `· ${a.rest}"` : ''}
+          ${a.rest > 0 ? `<button data-rest="${a.rest}" style="background:var(--purple);border:none;border-radius:8px;padding:3px 10px;color:#fff;font-size:11px;cursor:pointer;margin-left:8px;">▶</button>` : ''}
+        </div>
+        ${a.note ? `<div style="font-size:12px;color:#ddb0ff;margin-top:5px;">${a.note}</div>` : ''}
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          ${Array.from({ length: a.sets }, (_, si) => `
+            <input type="number" min="0" placeholder="reps s${si + 1}"
+              data-accessory-reps data-accessory-name="${a.name}" data-set-index="${si}"
+              style="width:70px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text);font-size:13px;">
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 function renderKineBlock(bloque) {
