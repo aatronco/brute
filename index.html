@@ -15,8 +15,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Brute">
   <link rel="apple-touch-icon" href="/icon-192.png">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 <body>
   <div id="app">
@@ -24,7 +22,10 @@
     <main id="main"></main>
     <div id="bottom-nav"></div>
   </div>
-  <script type="module" src="js/auth.js?v=4"></script>
+  <script type="module">
+    import { initRouter } from './js/router.js';
+    initRouter();
+  </script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
