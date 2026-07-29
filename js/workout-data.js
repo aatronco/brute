@@ -188,6 +188,11 @@ export const UPPER_A = {
       { name: 'Dead bug con disco',       load: '25 kg',                setsReps: '2×10/lado', rest: 30 },
     ],
   },
+
+  accessories: [
+    { name: 'Curl bíceps barra Z',           sets: 2, repRange: [10, 15], startKg: 15, incrementKg: 2.5, rest: 60, note: 'Finisher — 2ª frecuencia de brazo de la semana. Volumen bajo a propósito, el día pesado es Upper C.' },
+    { name: 'Extensión tríceps unilateral polea', sets: 2, repRange: [10, 15], startKg: 10, incrementKg: 1.25, rest: 60 },
+  ],
 };
 
 // ── Lower A — Sentadilla ─────────────────────────────────────────────────────
@@ -272,6 +277,11 @@ export const UPPER_B = {
       { name: 'Péndulo de Codman',                                 load: 'Sin carga',        setsReps: '30-60"' },
     ],
   },
+
+  accessories: [
+    { name: 'Curl inclinado banco 45°',   sets: 2, repRange: [10, 15], startKg: 10, incrementKg: 1,   rest: 60, note: 'Finisher — 2ª frecuencia de brazo de la semana. Posición estirada, complementa a las dominadas.' },
+    { name: 'Press francés mancuerna',    sets: 2, repRange: [10, 15], startKg: 8,  incrementKg: 1,   rest: 60 },
+  ],
 };
 
 // ── Lower B — Peso Muerto ────────────────────────────────────────────────────
