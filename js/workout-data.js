@@ -334,6 +334,9 @@ export const UPPER_C = {
     { name: 'Tríceps francés polea',     sets: 3, repRange: [10, 15], startKg: 20, incrementKg: 2.5, rest: 75 },
     { name: 'Tríceps pushdown',          sets: 3, repRange: [10, 15], startKg: 25, incrementKg: 2.5, rest: 75 },
     { name: 'Fondos en paralelas',       sets: 3, repRange: [8, 12],  startKg: 0,  incrementKg: 5,   rest: 90, note: 'Peso corporal primero, luego lastre.' },
+    { name: 'Elevación lateral mancuerna', sets: 3, repRange: [12, 15], startKg: 6, incrementKg: 1,   rest: 60, note: 'Hombro ancho — pausa 1 seg arriba, sin impulso.' },
+    { name: 'Pájaro mancuerna (posterior)', sets: 3, repRange: [12, 15], startKg: 6, incrementKg: 1,   rest: 60, note: 'Deltoide posterior — torso paralelo al piso.' },
+    { name: 'Abdominal oblicuo polea',    sets: 3, repRange: [10, 15], startKg: 15, incrementKg: 2.5, rest: 45, note: 'Rotación controlada, sin usar impulso lumbar.' },
   ],
 };
 
@@ -350,9 +353,10 @@ export const LOWER_C = {
 
   accessories: [
     { name: 'Prensa',                  sets: 3, repRange: [8, 12],  startKg: 180, incrementKg: 10,  rest: 90 },
-    { name: 'Squat low back bar',      sets: 3, repRange: [6, 10],  startKg: 100, incrementKg: 2.5,  rest: 120, note: 'Ya libre de tope EVA — puede correr como estímulo principal de cuádriceps.' },
+    { name: 'Sentadilla frontal',      sets: 3, repRange: [6, 10],  startKg: 60,  incrementKg: 2.5,  rest: 120, note: 'Reemplaza a la sentadilla trasera — patrón de fatiga distinto al T1 de Lower A. TOPE DURO RPE 7-8, nunca al fallo, sin importar en qué semana de la ola esté el T1.' },
     { name: 'Extensión de cuádriceps', sets: 3, repRange: [12, 15], startKg: 40,  incrementKg: 2.5,  rest: 60 },
     { name: 'Pistol SQ excéntrico',    sets: 2, repRange: [6, 10],  startKg: 0,   incrementKg: 2.5,  rest: 60, note: 'Añadir mancuerna cuando el corporal se sienta @7.' },
+    { name: 'Gemelos de pie',          sets: 4, repRange: [12, 20], startKg: 40,  incrementKg: 5,    rest: 45, note: 'Rango completo, pausa 1 seg arriba y abajo.' },
   ],
 };
 
