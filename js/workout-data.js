@@ -127,24 +127,40 @@ function t2ByWeek(base5RM) {
   return byWeek;
 }
 
-// ── S1: Empuje — T1 Press Banca ─────────────────────────────────────────────
-export const S1 = {
-  name: 'S1 — Empuje',
+// ── Upper A — Press Banca + Pendlay Row ─────────────────────────────────────
+export const UPPER_A = {
+  name: 'Upper A — Empuje/Tirón horizontal',
   color: 'pink',
+  icon: '💪',
   dayLabel: 'Día 1',
 
-  T1: {
-    exercise: 'Press Banca',
-    base2RM: 110,
-    prBase: 117,
-    byWeek: barbellByWeek(110, {
-      warmupReps: [8, 5, 2],
-      prAttempts: [
-        { label: 'Intento 1RM', reps: 1, kg: 112, rest: 300, type: 'pr', note: 'OPT-IN — solo si el single al 95% subió rápido y limpio' },
-        { label: 'PR ★',        reps: 1, kg: 117, rest: 0,   type: 'pr', note: 'e1RM actual — en déficit, superar 110×2 ya es progreso' },
-      ],
-    }),
-  },
+  T1: [
+    {
+      exercise: 'Press Banca',
+      base2RM: 110,
+      prBase: 117,
+      byWeek: barbellByWeek(110, {
+        warmupReps: [8, 5, 2],
+        prAttempts: [
+          { label: 'Intento 1RM', reps: 1, kg: 112, rest: 300, type: 'pr', note: 'OPT-IN — solo si el single al 95% subió rápido y limpio' },
+          { label: 'PR ★',        reps: 1, kg: 117, rest: 0,   type: 'pr', note: 'e1RM actual — en déficit, superar 110×2 ya es progreso' },
+        ],
+      }),
+    },
+    {
+      exercise: 'Pendlay Row',
+      base2RM: 70,
+      prBase: 75,
+      note: 'Base 2RM estimada por Epley desde 5RM 65 kg. Espalda plana, desde el suelo.',
+      byWeek: barbellByWeek(70, {
+        warmupReps: [8, 5, 2],
+        prAttempts: [
+          { label: 'Intento 1RM', reps: 1, kg: 72.5, rest: 300, type: 'pr', note: 'OPT-IN — técnica intacta, espalda plana todo el recorrido' },
+          { label: 'PR ★',        reps: 1, kg: 75,   rest: 0,   type: 'pr', note: 'e1RM actual' },
+        ],
+      }),
+    },
+  ],
 
   T2: [
     {
@@ -153,179 +169,186 @@ export const S1 = {
       note: 'Ola Rippler sobre 5RM 42.5 kg. Codos adelante, agarre más ancho.',
       removeWeeks: [11, 12],
     },
-    {
-      name: 'Fondos en paralelas',
-      setsReps: '3×8-12', rest: 90,
-      note: 'Peso corporal o +5 kg.',
-      removeWeeks: [11, 12],
-    },
-    {
-      name: 'Face pull polea',
-      setsReps: '3×15', rest: 60,
-      note: 'OBLIGATORIO — salud escapular.',
-      obligatorio: true,
-    },
+  ],
+
+  T3: [
+    { name: 'Face pull polea', setsReps: '3×15', rest: 60, note: 'OBLIGATORIO — salud escapular.', obligatorio: true },
   ],
 
   kineBlock: {
     label: '— Hombro Kine · Empuje —',
     note: 'PARTE ESTRUCTURAL DEL PROGRAMA — actualización kine julio 2026',
     exercises: [
-      { name: 'Chaos push up (pelota)',          load: 'Bandas gruesas',       setsReps: '2×máx',    rest: 30 },
-      { name: 'Press serrato unilateral',        load: 'Barra o mancuerna @8', setsReps: '2×20',     rest: 30 },
-      { name: 'Press banca inclinado con barra', load: '@7',                   setsReps: '3×8-10',   rest: 60, note: 'Con barra, NO multipower.' },
-      { name: 'Dead bug con disco',              load: '25 kg',                setsReps: '2×10/lado', rest: 30 },
+      { name: 'Chaos push up (pelota)',   load: 'Bandas gruesas',       setsReps: '2×máx',    rest: 30 },
+      { name: 'Press serrato unilateral', load: 'Barra o mancuerna @8', setsReps: '2×20',     rest: 30 },
+      { name: 'Dead bug con disco',       load: '25 kg',                setsReps: '2×10/lado', rest: 30 },
     ],
   },
-
-  T3: [
-    { name: 'Tríceps francés polea',   setsReps: '3×12-15', removeWeeks: [11, 12] },
-    { name: 'Tríceps pushdown',        setsReps: '3×12-15', removeWeeks: [11, 12] },
-    { name: 'Elevaciones laterales',   setsReps: '3×12-15', note: 'Pausa 1 seg posición baja.', removeWeeks: [11, 12] },
-    { name: 'Abdominal oblicuo polea', setsReps: '3×12-15/lado', removeWeeks: [11, 12] },
-    { name: 'Plancha abdominal',       setsReps: '3×45"', removeWeeks: [11, 12] },
-  ],
 };
 
-// ── S2: Pierna · Cuádriceps — receta kine (RPE, sin olas) ───────────────────
-export const S2 = {
-  name: 'S2 — Pierna · Cuádriceps',
+// ── Lower A — Sentadilla ─────────────────────────────────────────────────────
+export const LOWER_A = {
+  name: 'Lower A — Sentadilla',
   color: 'cyan',
+  icon: '🏔️',
   dayLabel: 'Día 2',
-  evaMax: 3,
-  bloque: [
-    { num: 1, name: 'Extensión de cuádriceps', load: '@8',             setsReps: '3×15',        rest: 30, video: true },
-    { num: 2, name: 'Prensa',                  load: '180–200 kg',     setsReps: '2×8/pierna',  rest: 30, video: true },
-    { num: 3, name: 'Squat low back bar',      load: '@8',             setsReps: '3×8',         rest: 60, video: true },
-    { num: 7, name: 'Pistol SQ excéntrico',    load: 'Sin peso',       setsReps: '2×8/pierna',  rest: 60, video: true },
+
+  T1: [
+    {
+      exercise: 'Sentadilla',
+      base2RM: 117.5,
+      prBase: 125,
+      note: 'Base 2RM por Epley desde 100 kg × 8 (e1RM 126.7 → e2RM 118.75, redondeado a 117.5).',
+      byWeek: barbellByWeek(117.5, {
+        warmupReps: [8, 5, 2],
+        prAttempts: [
+          { label: 'Intento 1RM', reps: 1, kg: 120, rest: 300, type: 'pr', note: 'OPT-IN — rodilla y espalda baja OK antes de intentar.' },
+          { label: 'PR ★',        reps: 1, kg: 125, rest: 0,   type: 'pr', note: 'e1RM actual' },
+        ],
+      }),
+    },
   ],
+
+  T2: [],
+  T3: [],
+
+  kineBlock: {
+    label: '— Pierna Kine —',
+    note: 'Cuádriceps libre de restricción EVA — este bloque es mantenimiento, no el estímulo principal del día.',
+    exercises: [
+      { name: 'Extensión de cuádriceps', load: '@8', setsReps: '2×15', rest: 30 },
+    ],
+  },
 };
 
-// ── S3: Tirón — T1 Dominadas (ola sobre 2RM total) ──────────────────────────
-export const S3 = {
-  name: 'S3 — Tirón',
-  color: 'mint',
+// ── Upper B — Press Inclinado + Dominadas ───────────────────────────────────
+export const UPPER_B = {
+  name: 'Upper B — Empuje inclinado/Tirón vertical',
+  color: 'orange',
+  icon: '💪',
   dayLabel: 'Día 3',
 
-  T1: {
-    exercise: 'Dominadas (ola 2RM)',
-    base2RMTotal: PULLUP.total2RM,
-    bodyweight: PULLUP.bodyweight,
-    note: `Ola sobre 2RM total (cuerpo + lastre) = ${PULLUP.total2RM} kg con PC ${PULLUP.bodyweight} kg. ` +
-          'Al bajar de peso en el déficit, reduce la asistencia ~2.5 kg por cada 2 kg de PC perdidos.',
-    byWeek: pullupByWeek(),
-  },
-
-  T2: [
+  T1: [
     {
-      name: 'Remo con barra (Pendlay)',
-      byWeek: t2ByWeek(65), rest: 120,
-      note: 'Ola Rippler sobre 5RM 65 kg. Espalda plana, desde el suelo.',
-      removeWeeks: [11, 12],
+      exercise: 'Press Inclinado',
+      base2RM: 75,
+      prBase: 80,
+      note: 'Base 2RM por Epley desde 60 kg × 10 (e1RM 80 → e2RM 75).',
+      byWeek: barbellByWeek(75, {
+        warmupReps: [8, 5, 2],
+        prAttempts: [
+          { label: 'Intento 1RM', reps: 1, kg: 77.5, rest: 300, type: 'pr', note: 'OPT-IN' },
+          { label: 'PR ★',        reps: 1, kg: 80,   rest: 0,   type: 'pr', note: 'e1RM actual' },
+        ],
+      }),
     },
     {
-      name: 'Remo mancuerna unilateral',
-      setsReps: '3×8-12/lado', rest: 90,
-      removeWeeks: [11, 12],
+      exercise: 'Dominadas (ola 2RM)',
+      base2RMTotal: PULLUP.total2RM,
+      bodyweight: PULLUP.bodyweight,
+      note: `Ola sobre 2RM total (cuerpo + lastre) = ${PULLUP.total2RM} kg con PC ${PULLUP.bodyweight} kg. ` +
+            'Al bajar de peso en el déficit, reduce la asistencia ~2.5 kg por cada 2 kg de PC perdidos.',
+      byWeek: pullupByWeek(),
     },
   ],
+
+  T2: [
+    { name: 'Remo mancuerna unilateral', setsReps: '3×8-12/lado', rest: 90, removeWeeks: [11, 12] },
+  ],
+  T3: [],
 
   kineBlock: {
     label: '— Hombro Kine · Rehabilitación —',
     note: 'PARTE ESTRUCTURAL DEL PROGRAMA — actualización kine julio 2026',
     exercises: [
-      { name: 'Retracción y depresión escapular colgado en barra', load: 'Peso corporal',      setsReps: '2×10',      rest: 30 },
-      { name: 'Isométrico de hombro acostado o en pared',          load: '5 kg (progresar)',   setsReps: '3×12',      rest: 60 },
-      { name: 'Flexoextensión + rotación interna de hombro',       load: '7,5–10 → 15 kg',     setsReps: '2×12',      rest: 60 },
-      { name: 'Nadador con bandas',                                load: 'Banda tensa',        setsReps: '2×12/brazo', rest: 60, note: 'Visto en consulta.' },
-      { name: 'Péndulo de Codman',                                 load: 'Sin carga',          setsReps: '30-60"',    note: 'Descarga articular entre ejercicios o al finalizar.' },
+      { name: 'Retracción y depresión escapular colgado en barra', load: 'Peso corporal',    setsReps: '2×10',      rest: 30 },
+      { name: 'Isométrico de hombro acostado o en pared',          load: '5 kg (progresar)', setsReps: '3×12',      rest: 60 },
+      { name: 'Nadador con bandas',                                load: 'Banda tensa',      setsReps: '2×12/brazo', rest: 60 },
+      { name: 'Péndulo de Codman',                                 load: 'Sin carga',        setsReps: '30-60"' },
     ],
   },
-
-  T3: [
-    { name: 'Curl bíceps mancuerna 45°',  setsReps: '3×10-12', note: 'Supinación completa.', removeWeeks: [11, 12] },
-    { name: 'Curl martillo',              setsReps: '3×10-12', note: 'Braquial y braquiorradial.', removeWeeks: [11, 12] },
-    { name: 'Curl concentrado mancuerna', setsReps: '3×10/lado', note: 'Contracción peak.', removeWeeks: [11, 12] },
-    { name: 'Gemelos en Smith',           setsReps: '3×15-20', note: 'Frecuencia 2×. Rango completo.', removeWeeks: [11, 12] },
-    { name: 'Curl inverso con barra',     setsReps: '2×12-15', note: 'Agarre prono. Antebrazo extensor.', removeWeeks: [11, 12] },
-  ],
 };
 
-// ── S4: Pierna · Glúteo/Posterior — receta kine (RPE, sin olas) ─────────────
-export const S4 = {
-  name: 'S4 — Pierna · Glúteo/Posterior',
-  color: 'orange',
-  dayLabel: 'Día 4',
-  evaMax: 3,
-  bloque: [
-    { num: 4, name: 'Hip thrust bilateral',    load: 'RPE 9',          setsReps: '3×10',          rest: 60, note: '3ª serie unilateral RPE 9.' },
-    { num: 5, name: 'High step con barra',     load: '70 kg',          setsReps: '2×15',          rest: 120, video: true },
-    { num: 6, name: 'Single leg RDL',          load: '45 kg totales',  setsReps: '2×12/pierna',   rest: 30 },
-    { num: 8, name: 'Búlgaras unilaterales',   load: '50 kg +',        setsReps: '12-15/pierna',  rest: 60 },
-    { num: 9, name: 'Pata de glúteo en polea', load: 'RPE 10',         setsReps: '3×12-15',       rest: 0, note: 'A la fatiga.' },
-  ],
-};
-
-// ── S5: Cadena Posterior — T1 Peso Muerto ───────────────────────────────────
-export const S5 = {
-  name: 'S5 — Cadena Posterior',
+// ── Lower B — Peso Muerto ────────────────────────────────────────────────────
+export const LOWER_B = {
+  name: 'Lower B — Cadena Posterior',
   color: 'gold',
-  dayLabel: 'Día 5',
+  icon: '⛓️',
+  dayLabel: 'Día 4',
 
-  T1: {
-    exercise: 'Peso Muerto Convencional',
-    base2RM: 177.5,
-    prBase: 190,
-    technicalCues: [
-      'Pies a ancho de cadera, barra sobre mediopiés',
-      'Caderas atrás, espalda neutra',
-      'Empuja el suelo — no jales la barra',
-      'Si la espalda baja se redondea, para la serie',
-    ],
-    byWeek: barbellByWeek(177.5, {
-      warmupReps: [5, 3, 2],
-      prAttempts: [
-        { label: 'Intento 1RM', reps: 1, kg: 182, rest: 300, type: 'pr', note: 'OPT-IN — evalúa rodilla antes. Rápido y limpio.' },
-        { label: 'PR ★',        reps: 1, kg: 190, rest: 0,   type: 'pr', note: 'e1RM actual — solo si el intento anterior fue impecable y rodilla OK' },
+  T1: [
+    {
+      exercise: 'Peso Muerto Convencional',
+      base2RM: 177.5,
+      prBase: 190,
+      technicalCues: [
+        'Pies a ancho de cadera, barra sobre mediopiés',
+        'Caderas atrás, espalda neutra',
+        'Empuja el suelo — no jales la barra',
+        'Si la espalda baja se redondea, para la serie',
       ],
-    }),
-  },
+      byWeek: barbellByWeek(177.5, {
+        warmupReps: [5, 3, 2],
+        prAttempts: [
+          { label: 'Intento 1RM', reps: 1, kg: 182, rest: 300, type: 'pr', note: 'OPT-IN — evalúa rodilla antes.' },
+          { label: 'PR ★',        reps: 1, kg: 190, rest: 0,   type: 'pr', note: 'e1RM actual' },
+        ],
+      }),
+    },
+  ],
 
   T2: [
-    {
-      name: 'Leg curl acostado',
-      setsReps: '4×8-12', rest: 90,
-      note: 'Bajada 3 seg. Isquiotibial en elongación.',
-      removeWeeks: [11, 12],
-    },
-    {
-      name: 'Gemelos en Smith',
-      setsReps: '4×15-20', rest: 75,
-      note: 'Rango completo. Pausa arriba y abajo.',
-      removeWeeks: [11, 12],
-    },
+    { name: 'Leg curl acostado', setsReps: '4×8-12', rest: 90, removeWeeks: [11, 12] },
   ],
+  T3: [],
 
   kineBlock: {
     label: '— Pierna Kine · Bloque E —',
-    note: 'Tercer estímulo de pierna de la semana — cargas moderadas, no busca fatiga máxima.',
+    note: 'Tercer estímulo de pierna de la semana — cargas moderadas.',
     exercises: [
-      { name: 'Extensión de cuádriceps', load: '@8',            setsReps: '3×15',       rest: 30 },
-      { name: 'Prensa',                  load: '180–200 kg',    setsReps: '2×8/pierna', rest: 30 },
-      { name: 'Single leg RDL',          load: '45 kg totales', setsReps: '2×12/pierna', rest: 30 },
+      { name: 'Single leg RDL', load: '45 kg totales', setsReps: '2×12/pierna', rest: 30 },
     ],
   },
+};
 
-  T3: [
-    { name: 'Push ups con protracción', setsReps: '3×máx', note: 'Empuje horizontal 2×.', removeWeeks: [11, 12] },
-    { name: 'Remo en polea sentado',    setsReps: '3×8-12', rest: 90, note: 'Tirón horizontal 2×. Codo pegado.', removeWeeks: [11, 12] },
-    { name: 'Back extension',           setsReps: '3×12-15', note: 'Erector espinal directo.', removeWeeks: [11, 12] },
-    { name: 'Pallof press en polea',    setsReps: '3×12/lado', note: 'Antirrotación.', removeWeeks: [11, 12] },
-    { name: 'Farmer carry',             setsReps: '3×30m', rest: 90, note: 'Grip al límite.', removeWeeks: [11, 12] },
+// ── Upper C — Brazo estético ─────────────────────────────────────────────────
+export const UPPER_C = {
+  name: 'Upper C — Bíceps + Tríceps',
+  color: 'mint',
+  icon: '💪',
+  dayLabel: 'Día 5',
+
+  T1: [],
+  T2: [],
+  T3: [],
+
+  accessories: [
+    { name: 'Curl bíceps mancuerna 45°', sets: 3, repRange: [8, 12],  startKg: 14, incrementKg: 2,   rest: 75, note: 'Supinación completa.' },
+    { name: 'Curl martillo',             sets: 3, repRange: [8, 12],  startKg: 14, incrementKg: 2,   rest: 75, note: 'Braquial y braquiorradial.' },
+    { name: 'Curl concentrado',          sets: 3, repRange: [10, 15], startKg: 10, incrementKg: 2,   rest: 60, note: 'Contracción peak.' },
+    { name: 'Tríceps francés polea',     sets: 3, repRange: [10, 15], startKg: 20, incrementKg: 2.5, rest: 75 },
+    { name: 'Tríceps pushdown',          sets: 3, repRange: [10, 15], startKg: 25, incrementKg: 2.5, rest: 75 },
+    { name: 'Fondos en paralelas',       sets: 3, repRange: [8, 12],  startKg: 0,  incrementKg: 5,   rest: 90, note: 'Peso corporal primero, luego lastre.' },
   ],
 };
 
-// Reglas kine (aplican a S2, S4 y bloques kine):
-//   · Dolor máximo 3/10 en escala EVA — si supera, reducir y reportar.
-//   · Enviar videos de los ejercicios marcados VIDEO (pierna 1, 2, 3, 5 y 7).
-export const SESSIONS = { S1, S2, S3, S4, S5 };
+// ── Lower C — Cuádriceps libre ───────────────────────────────────────────────
+export const LOWER_C = {
+  name: 'Lower C — Cuádriceps',
+  color: 'purple',
+  icon: '🦵',
+  dayLabel: 'Día 6',
+
+  T1: [],
+  T2: [],
+  T3: [],
+
+  accessories: [
+    { name: 'Prensa',                  sets: 3, repRange: [8, 12],  startKg: 180, incrementKg: 10,  rest: 90 },
+    { name: 'Squat low back bar',      sets: 3, repRange: [6, 10],  startKg: 100, incrementKg: 2.5,  rest: 120, note: 'Ya libre de tope EVA — puede correr como estímulo principal de cuádriceps.' },
+    { name: 'Extensión de cuádriceps', sets: 3, repRange: [12, 15], startKg: 40,  incrementKg: 2.5,  rest: 60 },
+    { name: 'Pistol SQ excéntrico',    sets: 2, repRange: [6, 10],  startKg: 0,   incrementKg: 2.5,  rest: 60, note: 'Añadir mancuerna cuando el corporal se sienta @7.' },
+  ],
+};
+
+export const SESSIONS = { upperA: UPPER_A, lowerA: LOWER_A, upperB: UPPER_B, lowerB: LOWER_B, upperC: UPPER_C, lowerC: LOWER_C };
