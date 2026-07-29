@@ -22,7 +22,7 @@ function getPRTargets(sessionKey, t1Index) {
   return WEEKS.map(week => {
     const sets = t1.byWeek[week];
     if (!sets) return { week, top: null };
-    const topWork = [...(sets.warmup || []), ...(sets.work || [])].filter(s => s.type !== 'warmup');
+    const topWork = sets.work || [];
     const pr     = topWork.find(s => s.type === 'pr');
     const topSet = pr || topWork.reduce((a, b) => (b.kg > (a?.kg || 0) ? b : a), null);
     return { week, top: typeof topSet?.kg === 'number' ? topSet.kg : null, reps: topSet?.reps || null, label: topSet?.label || '' };
