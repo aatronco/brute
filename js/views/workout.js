@@ -87,7 +87,7 @@ function renderTiers(sessionKey, session, week) {
       <h2 class="sh" style="margin-top:18px;">
         <span class="dot" style="background:var(--orange)"></span>Accesorios — carga progresiva
       </h2>
-      ${renderAccessoryList(sessionKey, session.accessories)}
+      ${renderAccessoryList(sessionKey, session.accessories, week)}
     ` : ''}
   `;
 }
@@ -270,20 +270,21 @@ function renderT3List(exercises, week) {
     }).join('');
 }
 
-function renderAccessoryList(sessionKey, accessories) {
+function renderAccessoryList(sessionKey, accessories, week) {
   return accessories.map((a, i) => {
     const kg = getAccessoryWeight(sessionKey, a.name, a.startKg);
+    const effectiveSets = week >= 11 ? Math.max(1, Math.round(a.sets * 0.7)) : a.sets;
     return `
       <div class="session-card" data-accessory-card data-accessory-index="${i}">
         <div class="session-card__title">${a.name}</div>
         <div class="ex-meta" style="font-size:13px;color:var(--dim);">
-          <b style="color:var(--text)">${kg} kg</b> · ${a.sets}×${a.repRange[0]}-${a.repRange[1]}
+          <b style="color:var(--text)">${kg} kg</b> · ${effectiveSets}×${a.repRange[0]}-${a.repRange[1]}
           ${a.rest ? `· ${a.rest}"` : ''}
           ${a.rest > 0 ? `<button data-rest="${a.rest}" style="background:var(--purple);border:none;border-radius:8px;padding:3px 10px;color:#fff;font-size:11px;cursor:pointer;margin-left:8px;">▶</button>` : ''}
         </div>
         ${a.note ? `<div style="font-size:12px;color:#ddb0ff;margin-top:5px;">${a.note}</div>` : ''}
         <div style="display:flex;gap:6px;margin-top:8px;">
-          ${Array.from({ length: a.sets }, (_, si) => `
+          ${Array.from({ length: effectiveSets }, (_, si) => `
             <input type="number" min="0" placeholder="reps s${si + 1}"
               data-accessory-reps data-accessory-name="${a.name}" data-set-index="${si}"
               style="width:70px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text);font-size:13px;">
