@@ -1,0 +1,10 @@
+{
+  "name": "brute",
+  "version": "1.0.0",
+  "description": "Brute — personal powerlifting + hipertrofia PWA (no login, no cloud sync)",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": { "node": ">=18" }
+}
