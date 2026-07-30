@@ -228,6 +228,11 @@ export const LOWER_A = {
       { name: 'Extensión de cuádriceps', load: '@8', setsReps: '2×15', rest: 30 },
     ],
   },
+
+  accessories: [
+    { name: 'Hip thrust bilateral',        sets: 4, repRange: [8, 15],  startKg: 60, incrementKg: 5,   rest: 90, note: 'Prioridad de crecimiento glúteo — patrón de cadera, bajo solapamiento con la sentadilla. Pausa 2 seg arriba, aprieta al máximo.' },
+    { name: 'Abducción de cadera máquina',  sets: 3, repRange: [15, 20], startKg: 20, incrementKg: 2.5, rest: 45, note: 'Glúteo medio — alto rango de reps, al fallo técnico en la última serie.' },
+  ],
 };
 
 // ── Upper B — Press Inclinado + Dominadas ───────────────────────────────────
@@ -324,6 +329,11 @@ export const LOWER_B = {
       { name: 'Single leg RDL', load: '45 kg totales', setsReps: '2×12/pierna', rest: 30 },
     ],
   },
+
+  accessories: [
+    { name: 'Búlgaras unilaterales',    sets: 4, repRange: [10, 15], startKg: 30, incrementKg: 2.5, rest: 75, note: 'Glúteo + cuádriceps unilateral. Peso por lado — prioridad de crecimiento glúteo.' },
+    { name: 'Pata de glúteo en polea',  sets: 4, repRange: [12, 20], startKg: 15, incrementKg: 2.5, rest: 45, note: 'Aislamiento puro — sin carga axial, seguro después del peso muerto. Última serie al fallo técnico.' },
+  ],
 };
 
 // ── Upper C — Brazo estético ─────────────────────────────────────────────────
@@ -350,9 +360,9 @@ export const UPPER_C = {
   ],
 };
 
-// ── Lower C — Cuádriceps libre ───────────────────────────────────────────────
+// ── Lower C — Cuádriceps + Glúteo libre ──────────────────────────────────────
 export const LOWER_C = {
-  name: 'Lower C — Cuádriceps',
+  name: 'Lower C — Cuádriceps + Glúteo',
   color: 'purple',
   icon: '🦵',
   dayLabel: 'Día 6',
@@ -364,6 +374,7 @@ export const LOWER_C = {
   accessories: [
     { name: 'Prensa',                  sets: 3, repRange: [8, 12],  startKg: 180, incrementKg: 10,  rest: 90 },
     { name: 'Sentadilla frontal',      sets: 3, repRange: [6, 10],  startKg: 60,  incrementKg: 2.5,  rest: 120, note: 'Reemplaza a la sentadilla trasera — patrón de fatiga distinto al T1 de Lower A. TOPE DURO RPE 7-8, nunca al fallo, sin importar en qué semana de la ola esté el T1.' },
+    { name: 'High step con barra',     sets: 4, repRange: [10, 15], startKg: 40,  incrementKg: 2.5,  rest: 90, note: 'Glúteo + cuádriceps — cuarto estímulo de glúteo de la semana.' },
     { name: 'Extensión de cuádriceps', sets: 3, repRange: [12, 15], startKg: 40,  incrementKg: 2.5,  rest: 60 },
     { name: 'Pistol SQ excéntrico',    sets: 2, repRange: [6, 10],  startKg: 0,   incrementKg: 2.5,  rest: 60, note: 'Añadir mancuerna cuando el corporal se sienta @7.' },
     { name: 'Gemelos de pie',          sets: 4, repRange: [12, 20], startKg: 40,  incrementKg: 5,    rest: 45, note: 'Rango completo, pausa 1 seg arriba y abajo.' },
